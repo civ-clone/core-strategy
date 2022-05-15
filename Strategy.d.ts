@@ -1,5 +1,6 @@
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
+import Routine from './Routine';
 export interface IStrategy {
   active(): boolean;
   setActive(active: boolean): void;
@@ -10,7 +11,7 @@ export interface IStrategy {
 }
 export declare class Strategy implements IStrategy {
   #private;
-  constructor(...items: (typeof PlayerAction | Priority)[]);
+  constructor(...items: (Priority | Routine)[]);
   active(): boolean;
   setActive(active: boolean): void;
   /**

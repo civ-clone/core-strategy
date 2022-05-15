@@ -1,6 +1,7 @@
 import Normal from '@civ-clone/core-rule/Priorities/Normal';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
+import Routine from './Routine';
 
 export interface IStrategy {
   active(): boolean;
@@ -14,9 +15,9 @@ export interface IStrategy {
 export class Strategy implements IStrategy {
   #active: boolean = false;
   #priority: Priority = new Normal();
-  #supportedPlayerActions: typeof PlayerAction[] = [];
+  #routines: Routine[] = [];
 
-  constructor(...items: (typeof PlayerAction | Priority)[]) {
+  constructor(...items: (Priority | Routine)[]) {
     items.forEach((item) => {
       if (item instanceof Priority) {
         this.#priority = item;
@@ -24,11 +25,8 @@ export class Strategy implements IStrategy {
         return;
       }
 
-      if (
-        typeof item === 'function' &&
-        Object.prototype.isPrototypeOf.call(PlayerAction, item)
-      ) {
-        this.#supportedPlayerActions.push(item);
+      if (item instanceof Routine) {
+        this.#routines.push(item);
 
         return;
       }
@@ -37,6 +35,8 @@ export class Strategy implements IStrategy {
         `Unsupported argument passed to ${this.constructor.name} constructor: ${item}`
       );
     });
+
+    this.#routines.sort((a, b) => a.priority().value() - b.priority().value());
   }
 
   public active(): boolean {
@@ -51,13 +51,17 @@ export class Strategy implements IStrategy {
    * Checks to see if the `action` can be handled, returns `true` if it is, `false` otherwise.
    */
   public attempt(action: PlayerAction): Promise<boolean> {
-    throw new TypeError('`attempt` must be overridden.');
+    return this.#routines
+      .filter((routine) => routine.canHandle(action))
+      .reduce(
+        (promise, routine) =>
+          promise.then((result) => result || routine.attempt(action)),
+        Promise.resolve(false)
+      );
   }
 
   public canHandle(action: PlayerAction): boolean {
-    return this.#supportedPlayerActions.some(
-      (ActionType) => action instanceof ActionType
-    );
+    return this.#routines.some((routine) => routine.canHandle(action));
   }
 
   public priority(): Priority {

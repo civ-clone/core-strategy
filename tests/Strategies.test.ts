@@ -1,5 +1,6 @@
 import High from '@civ-clone/core-rule/Priorities/High';
-import PlayerAction from '@civ-clone/core-player/PlayerAction';
+import { PlayerActionA } from './lib/PlayerActions';
+import { RoutineTrue, RoutineFalse } from './lib/Routines';
 import Strategies from '../Strategies';
 import Strategy from '../Strategy';
 import { expect, spy, use } from 'chai';
@@ -8,81 +9,65 @@ import * as spies from 'chai-spies';
 use(spies);
 
 describe('Strategies', () => {
-  const A = class extends Strategy {
-      async attempt(action: PlayerAction): Promise<boolean> {
-        return true;
-      }
-    },
-    B = class extends Strategy {
-      async attempt(action: PlayerAction): Promise<boolean> {
-        return true;
-      }
-    },
-    ActionA = class extends PlayerAction {};
-
   it('should filter inactive `Strategy`s', async () => {
-    const a = new A(ActionA),
-      b = new B(ActionA),
-      strategies = new Strategies(a, b),
-      spyA = spy.on(a, 'attempt'),
-      spyB = spy.on(b, 'attempt');
+    const strategyA = new Strategy(new RoutineTrue(PlayerActionA)),
+      strategyB = new Strategy(new RoutineTrue(PlayerActionA)),
+      strategies = new Strategies(strategyA, strategyB),
+      spyA = spy.on(strategyA, 'attempt'),
+      spyB = spy.on(strategyB, 'attempt');
 
-    b.setActive(true);
+    strategyB.setActive(true);
 
-    expect(await strategies.attempt(new ActionA(null))).true;
+    expect(await strategies.attempt(new PlayerActionA(null))).true;
     expect(spyA).not.called;
     expect(spyB).called;
   });
 
-  it('should only call the first successful `Strategy`', async () => {
-    const a = new A(ActionA),
-      b = new B(ActionA),
-      strategies = new Strategies(a, b),
-      spyA = spy.on(a, 'attempt'),
-      spyB = spy.on(b, 'attempt');
+  it('should stop calling `Strategy`s after the first successful `attempt()`', async () => {
+    const strategyA = new Strategy(new RoutineTrue(PlayerActionA)),
+      strategyB = new Strategy(new RoutineFalse(PlayerActionA)),
+      strategies = new Strategies(strategyA, strategyB),
+      spyA = spy.on(strategyA, 'attempt'),
+      spyB = spy.on(strategyB, 'attempt');
 
-    a.setActive(true);
-    b.setActive(true);
+    strategyA.setActive(true);
+    strategyB.setActive(true);
 
-    expect(await strategies.attempt(new ActionA(null))).true;
+    expect(await strategies.attempt(new PlayerActionA(null))).true;
     expect(spyA).called;
     expect(spyB).not.called;
   });
 
-  it('should respect `Strategy` `Priority`', async () => {
-    const a = new A(ActionA),
-      b = new B(new High(), ActionA),
-      strategies = new Strategies(a, b),
-      spyA = spy.on(a, 'attempt'),
-      spyB = spy.on(b, 'attempt');
+  it('should respect `Strategy` `Priority`s', async () => {
+    const routine = new RoutineTrue(PlayerActionA),
+      strategyA = new Strategy(routine),
+      strategyB = new Strategy(routine, new High()),
+      strategies = new Strategies(strategyA, strategyB),
+      spyA = spy.on(strategyA, 'attempt'),
+      spyB = spy.on(strategyB, 'attempt');
 
-    a.setActive(true);
-    b.setActive(true);
+    strategyA.setActive(true);
+    strategyB.setActive(true);
 
-    expect(await strategies.attempt(new ActionA(null))).true;
+    expect(await strategies.attempt(new PlayerActionA(null))).true;
     expect(spyA).not.called;
     expect(spyB).called;
   });
 
   it('should return false if there are no successfully executed `Strategy`s', async () => {
-    const A = class extends Strategy {
-        async attempt(action: PlayerAction): Promise<boolean> {
-          return false;
-        }
-      },
-      a = new A(ActionA),
-      b = new A(ActionA),
-      c = new A(ActionA),
-      strategies = new Strategies(a, b, c),
-      spyA = spy.on(a, 'attempt'),
-      spyB = spy.on(b, 'attempt'),
-      spyC = spy.on(c, 'attempt');
+    const strategyA = new Strategy(new RoutineFalse(PlayerActionA)),
+      strategyB = new Strategy(new RoutineFalse(PlayerActionA)),
+      strategyC = new Strategy(new RoutineFalse(PlayerActionA)),
+      strategies = new Strategies(strategyA, strategyB, strategyC),
+      spyA = spy.on(strategyA, 'attempt'),
+      spyB = spy.on(strategyB, 'attempt'),
+      spyC = spy.on(strategyC, 'attempt');
 
-    a.setActive(true);
-    b.setActive(true);
-    c.setActive(true);
+    strategyA.setActive(true);
+    strategyB.setActive(true);
+    strategyC.setActive(true);
 
-    expect(await strategies.attempt(new ActionA(null))).false;
+    expect(await strategies.attempt(new PlayerActionA(null))).false;
     expect(spyA).called;
     expect(spyB).called;
     expect(spyC).called;
