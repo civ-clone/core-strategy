@@ -1,3 +1,5 @@
+import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
+import Player from '@civ-clone/core-player/Player';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
 import Routine from './Routine';
@@ -11,7 +13,7 @@ export interface IStrategy {
 }
 export declare class Strategy implements IStrategy {
   #private;
-  constructor(...items: (Priority | Routine)[]);
+  constructor(...items: (Player | Priority | Routine | RuleRegistry)[]);
   active(): boolean;
   setActive(active: boolean): void;
   /**

@@ -12,7 +12,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _StrategyNote_key, _StrategyNote_value;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StrategyNote = void 0;
+exports.generateKey = exports.StrategyNote = void 0;
+const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
 class StrategyNote {
     constructor(key, value) {
         _StrategyNote_key.set(this, void 0);
@@ -29,5 +30,13 @@ class StrategyNote {
 }
 exports.StrategyNote = StrategyNote;
 _StrategyNote_key = new WeakMap(), _StrategyNote_value = new WeakMap();
+const generateKey = (...items) => items
+    .map((item) => item instanceof DataObject_1.default
+    ? item.id()
+    : typeof item === 'string'
+        ? item
+        : item.toString())
+    .join('-');
+exports.generateKey = generateKey;
 exports.default = StrategyNote;
 //# sourceMappingURL=StrategyNote.js.map

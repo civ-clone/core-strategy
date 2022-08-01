@@ -12,4 +12,5 @@ export declare class StrategyNoteRegistry
 {
   getByKey(key: string): StrategyNote[];
 }
+export declare const instance: StrategyNoteRegistry;
 export default StrategyNoteRegistry;

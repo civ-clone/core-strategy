@@ -1,9 +1,10 @@
+import Normal from '@civ-clone/core-rule/Priorities/Normal';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
-import Normal from '@civ-clone/core-rule/Priorities/Normal';
 
 export interface IRoutine {
   attempt(action: PlayerAction): Promise<boolean>;
+  canHandle(action: PlayerAction): boolean;
   priority(): Priority;
 }
 

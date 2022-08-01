@@ -1,9 +1,9 @@
-import Normal from '@civ-clone/core-rule/Priorities/Normal';
 import { PlayerActionA, PlayerActionB } from './lib/PlayerActions';
+import High from '@civ-clone/core-rule/Priorities/High';
+import Low from '@civ-clone/core-rule/Priorities/Low';
+import Normal from '@civ-clone/core-rule/Priorities/Normal';
 import Routine from '../Routine';
 import { expect } from 'chai';
-import Low from '@civ-clone/core-rule/Priorities/Low';
-import High from '@civ-clone/core-rule/Priorities/High';
 
 describe('Routine', () => {
   it('should default to `Normal` `Priority`', () => {

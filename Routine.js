@@ -13,9 +13,9 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
 var _Routine_priority, _Routine_supportedPlayerActions;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Routine = void 0;
+const Normal_1 = require("@civ-clone/core-rule/Priorities/Normal");
 const PlayerAction_1 = require("@civ-clone/core-player/PlayerAction");
 const Priority_1 = require("@civ-clone/core-rule/Priority");
-const Normal_1 = require("@civ-clone/core-rule/Priorities/Normal");
 class Routine {
     constructor(...items) {
         _Routine_priority.set(this, new Normal_1.default());

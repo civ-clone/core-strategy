@@ -17,4 +17,6 @@ export class StrategyNoteRegistry
   }
 }
 
+export const instance: StrategyNoteRegistry = new StrategyNoteRegistry();
+
 export default StrategyNoteRegistry;

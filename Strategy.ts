@@ -1,4 +1,10 @@
+import { Created, ICreatedRegistry } from './Rules/Created';
+import {
+  RuleRegistry,
+  instance as ruleRegistryInstance,
+} from '@civ-clone/core-rule/RuleRegistry';
 import Normal from '@civ-clone/core-rule/Priorities/Normal';
+import Player from '@civ-clone/core-player/Player';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
 import Routine from './Routine';
@@ -14,11 +20,19 @@ export interface IStrategy {
 
 export class Strategy implements IStrategy {
   #active: boolean = false;
+  #player: Player | null = null;
   #priority: Priority = new Normal();
   #routines: Routine[] = [];
+  #ruleRegistry: RuleRegistry = ruleRegistryInstance;
 
-  constructor(...items: (Priority | Routine)[]) {
+  constructor(...items: (Player | Priority | Routine | RuleRegistry)[]) {
     items.forEach((item) => {
+      if (item instanceof Player) {
+        this.#player = item;
+
+        return;
+      }
+
       if (item instanceof Priority) {
         this.#priority = item;
 
@@ -31,12 +45,28 @@ export class Strategy implements IStrategy {
         return;
       }
 
+      if (item instanceof RuleRegistry) {
+        this.#ruleRegistry = item;
+
+        return;
+      }
+
       throw new TypeError(
         `Unsupported argument passed to ${this.constructor.name} constructor: ${item}`
       );
     });
 
+    if (this.#player === null) {
+      throw new TypeError('Missing `Player` object.');
+    }
+
     this.#routines.sort((a, b) => a.priority().value() - b.priority().value());
+
+    (this.#ruleRegistry as ICreatedRegistry).process(
+      Created,
+      this,
+      this.#player
+    );
   }
 
   public active(): boolean {
