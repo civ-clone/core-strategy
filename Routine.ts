@@ -1,30 +1,35 @@
-import Normal from '@civ-clone/core-rule/Priorities/Normal';
+import {
+  RuleRegistry,
+  instance as ruleRegistryInstance,
+} from '@civ-clone/core-rule/RuleRegistry';
+import Player from '@civ-clone/core-player/Player';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
+import PriorityRule from './Rules/Priority';
+import classExtends from './lib/classExtends';
 
 export interface IRoutine {
   attempt(action: PlayerAction): Promise<boolean>;
   canHandle(action: PlayerAction): boolean;
-  priority(): Priority;
+  priority(player: Player): Priority;
 }
 
 export class Routine implements IRoutine {
-  #priority: Priority = new Normal();
+  #ruleRegistry: RuleRegistry = ruleRegistryInstance;
   #supportedPlayerActions: typeof PlayerAction[] = [];
 
-  constructor(...items: (Priority | typeof PlayerAction)[]) {
+  constructor(...items: (typeof PlayerAction | RuleRegistry)[]) {
     items.forEach((item) => {
-      if (
-        typeof item === 'function' &&
-        Object.prototype.isPrototypeOf.call(PlayerAction, item)
-      ) {
-        this.#supportedPlayerActions.push(item as typeof PlayerAction);
+      if (item instanceof RuleRegistry) {
+        this.#ruleRegistry = item;
 
         return;
       }
 
-      if (item instanceof Priority) {
-        this.#priority = item;
+      if (classExtends(item, PlayerAction)) {
+        this.#supportedPlayerActions.push(item);
+
+        return;
       }
     });
   }
@@ -39,8 +44,16 @@ export class Routine implements IRoutine {
     );
   }
 
-  public priority(): Priority {
-    return this.#priority;
+  public priority(player: Player): Priority {
+    return new Priority(
+      // This takes the highest priority (lowest value) from all the applicable `PriorityRule`s
+      Math.min(
+        ...this.#ruleRegistry
+          .process(PriorityRule, player, this)
+          .map((priority) => priority.value()),
+        Infinity
+      )
+    );
   }
 }
 

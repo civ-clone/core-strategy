@@ -11,3 +11,7 @@ export class RoutineFalse extends Routine {
     return Promise.resolve(false);
   }
 }
+
+export class RoutineA extends RoutineTrue {}
+
+export class RoutineB extends RoutineTrue {}
