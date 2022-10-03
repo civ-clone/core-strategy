@@ -4,16 +4,16 @@ type IDataObject = {
   id(): string;
 };
 
-export interface IStrategyNote {
+export interface IStrategyNote<Value = any> {
   key(): string;
-  value(): any;
+  value(): Value;
 }
 
-export class StrategyNote implements IStrategyNote {
+export class StrategyNote<Value = any> implements IStrategyNote<Value> {
   #key: string;
   #value: any;
 
-  constructor(key: string, value: any) {
+  constructor(key: string, value: Value) {
     this.#key = key;
     this.#value = value;
   }
@@ -22,7 +22,7 @@ export class StrategyNote implements IStrategyNote {
     return this.#key;
   }
 
-  public value(): any {
+  public value(): Value {
     return this.#value;
   }
 }

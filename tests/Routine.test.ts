@@ -1,5 +1,4 @@
 import { High, Low, Normal } from '@civ-clone/core-rule/Priorities';
-import { PlayerActionA, PlayerActionB } from './lib/PlayerActions';
 import { RoutineB, RoutineA } from './lib/Routines';
 import { TraitFull, TraitHalf, TraitNone } from './lib/Traits';
 import Civilization from '@civ-clone/core-civilization/Civilization';
@@ -22,13 +21,6 @@ describe('Routine', () => {
     const routine = new Routine();
 
     expect(routine.priority(testPlayer).value()).equal(Infinity);
-  });
-
-  it('should be possible to limit the `PlayerAction`s that can be handled', async () => {
-    const routine = new Routine(PlayerActionA);
-
-    expect(routine.canHandle(new PlayerActionB(testPlayer, null))).false;
-    expect(routine.canHandle(new PlayerActionA(testPlayer, null))).true;
   });
 
   it('should be possible to prioritise based on `Priority` `Rule`s', async () => {

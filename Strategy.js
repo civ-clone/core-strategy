@@ -20,11 +20,7 @@ class Strategy {
         return __classPrivateFieldGet(this, _Strategy_routines, "f")
             .sort((a, b) => a.priority(action.player()).value() -
             b.priority(action.player()).value())
-            .filter((routine) => routine.canHandle(action))
             .reduce((promise, routine) => promise.then((result) => result || routine.attempt(action)), Promise.resolve(false));
-    }
-    canHandle(action) {
-        return __classPrivateFieldGet(this, _Strategy_routines, "f").some((routine) => routine.canHandle(action));
     }
     priority(player) {
         return new Priority_1.default(Math.min(...__classPrivateFieldGet(this, _Strategy_routines, "f").map((routine) => routine.priority(player).value()), Infinity));

@@ -1,5 +1,5 @@
 import { High, Normal } from '@civ-clone/core-rule/Priorities';
-import { PlayerActionA, PlayerActionB } from './lib/PlayerActions';
+import { PlayerActionA } from './lib/PlayerActions';
 import { RoutineFalse, RoutineB, RoutineA, RoutineTrue } from './lib/Routines';
 import { expect, spy } from 'chai';
 import Criterion from '@civ-clone/core-rule/Criterion';
@@ -17,17 +17,10 @@ describe('Strategy', () => {
   it('should default to `Priority(Infinity)`', () =>
     expect(new Strategy().priority(testPlayer).value()).eq(Infinity));
 
-  it('should be possible to limit the `PlayerAction`s that can be handled, via the `Routine`s', () => {
-    const strategy = new Strategy(new RoutineTrue(PlayerActionA));
-
-    expect(strategy.canHandle(new PlayerActionA(testPlayer, null))).true;
-    expect(strategy.canHandle(new PlayerActionB(testPlayer, null))).false;
-  });
-
   it('should stop calling `Routine`s after the first successful `attempt()`', async () => {
-    const routineA = new RoutineFalse(PlayerActionA),
-      routineB = new RoutineTrue(PlayerActionA),
-      routineC = new RoutineTrue(PlayerActionA),
+    const routineA = new RoutineFalse(),
+      routineB = new RoutineTrue(),
+      routineC = new RoutineTrue(),
       strategy = new Strategy(routineA, routineB, routineC),
       spyA = spy.on(routineA, 'attempt'),
       spyB = spy.on(routineB, 'attempt'),
@@ -41,8 +34,8 @@ describe('Strategy', () => {
 
   it('should respect `Routine` `Priority`s', async () => {
     const ruleRegistry = new RuleRegistry(),
-      routineA = new RoutineA(PlayerActionA, ruleRegistry),
-      routineB = new RoutineB(PlayerActionA, ruleRegistry),
+      routineA = new RoutineA(ruleRegistry),
+      routineB = new RoutineB(ruleRegistry),
       strategy = new Strategy(routineA, routineB),
       spyA = spy.on(routineA, 'attempt'),
       spyB = spy.on(routineB, 'attempt');
@@ -71,9 +64,9 @@ describe('Strategy', () => {
   });
 
   it('should return false if there are no successfully executed `Routine`s', async () => {
-    const routineA = new RoutineFalse(PlayerActionA),
-      routineB = new RoutineFalse(PlayerActionA),
-      routineC = new RoutineFalse(PlayerActionA),
+    const routineA = new RoutineFalse(),
+      routineB = new RoutineFalse(),
+      routineC = new RoutineFalse(),
       strategy = new Strategy(routineA, routineB, routineC),
       spyA = spy.on(routineA, 'attempt'),
       spyB = spy.on(routineB, 'attempt'),

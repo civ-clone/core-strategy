@@ -1,15 +1,15 @@
 declare type IDataObject = {
   id(): string;
 };
-export interface IStrategyNote {
+export interface IStrategyNote<Value = any> {
   key(): string;
-  value(): any;
+  value(): Value;
 }
-export declare class StrategyNote implements IStrategyNote {
+export declare class StrategyNote<Value = any> implements IStrategyNote<Value> {
   #private;
-  constructor(key: string, value: any);
+  constructor(key: string, value: Value);
   key(): string;
-  value(): any;
+  value(): Value;
 }
 export declare const generateKey: (
   ...items: (IDataObject | string)[]

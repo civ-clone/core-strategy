@@ -12,8 +12,8 @@ describe('StrategyRegistry', () => {
   const testPlayer = new Player();
 
   it('should filter inactive `Strategy`s', async () => {
-    const strategyA = new Strategy(new RoutineTrue(PlayerActionA)),
-      strategyB = new Strategy(new RoutineTrue(PlayerActionA)),
+    const strategyA = new Strategy(new RoutineTrue()),
+      strategyB = new Strategy(new RoutineTrue()),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt');
@@ -27,8 +27,8 @@ describe('StrategyRegistry', () => {
   });
 
   it('should stop calling `Strategy`s after the first successful `attempt()`', async () => {
-    const strategyA = new Strategy(new RoutineTrue(PlayerActionA)),
-      strategyB = new Strategy(new RoutineFalse(PlayerActionA)),
+    const strategyA = new Strategy(new RoutineTrue()),
+      strategyB = new Strategy(new RoutineFalse()),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt');
@@ -42,7 +42,7 @@ describe('StrategyRegistry', () => {
   });
 
   it('should respect `Strategy` `Priority`s', async () => {
-    const routine = new RoutineTrue(PlayerActionA),
+    const routine = new RoutineTrue(),
       strategyA = new Strategy(routine),
       strategyB = new Strategy(routine),
       strategyRegistry = new StrategyRegistry(),
@@ -58,9 +58,9 @@ describe('StrategyRegistry', () => {
   });
 
   it('should return false if there are no successfully executed `Strategy`s', async () => {
-    const strategyA = new Strategy(new RoutineFalse(PlayerActionA)),
-      strategyB = new Strategy(new RoutineFalse(PlayerActionA)),
-      strategyC = new Strategy(new RoutineFalse(PlayerActionA)),
+    const strategyA = new Strategy(new RoutineFalse()),
+      strategyB = new Strategy(new RoutineFalse()),
+      strategyC = new Strategy(new RoutineFalse()),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt'),

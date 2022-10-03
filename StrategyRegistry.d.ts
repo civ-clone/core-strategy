@@ -8,7 +8,6 @@ export declare class StrategyRegistry extends EntityRegistry<Strategy> {
    * tried.
    */
   attempt(action: PlayerAction): Promise<boolean>;
-  handleableStrategies(action: PlayerAction): Strategy[];
 }
 export declare const instance: StrategyRegistry;
 export default StrategyRegistry;

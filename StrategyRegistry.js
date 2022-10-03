@@ -12,12 +12,11 @@ class StrategyRegistry extends EntityRegistry_1.default {
      * tried.
      */
     attempt(action) {
-        return this.handleableStrategies(action).reduce((promise, strategy) => promise.then((result) => result || strategy.attempt(action)), Promise.resolve(false));
-    }
-    handleableStrategies(action) {
-        return this.filter((strategy) => strategy.canHandle(action)).sort((a, b) => a.priority(action.player()).value() -
+        return this.entries()
+            .sort((a, b) => a.priority(action.player()).value() -
             b.priority(action.player()).value() ||
-            Math.floor(Math.random() * 3 - 1));
+            Math.floor(Math.random() * 3 - 1))
+            .reduce((promise, strategy) => promise.then((result) => result || strategy.attempt(action)), Promise.resolve(false));
     }
 }
 exports.StrategyRegistry = StrategyRegistry;
