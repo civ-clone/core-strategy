@@ -1,14 +1,14 @@
 import Routine from '../../Routine';
 
 export class RoutineTrue extends Routine {
-  public attempt(): Promise<boolean> {
-    return Promise.resolve(true);
+  public attempt(): boolean {
+    return true;
   }
 }
 
 export class RoutineFalse extends Routine {
-  public attempt(): Promise<boolean> {
-    return Promise.resolve(false);
+  public attempt(): boolean {
+    return false;
   }
 }
 

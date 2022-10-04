@@ -16,7 +16,7 @@ class StrategyRegistry extends EntityRegistry_1.default {
             .sort((a, b) => a.priority(action.player()).value() -
             b.priority(action.player()).value() ||
             Math.floor(Math.random() * 3 - 1))
-            .reduce((promise, strategy) => promise.then((result) => result || strategy.attempt(action)), Promise.resolve(false));
+            .some((strategy) => strategy.attempt(action));
     }
 }
 exports.StrategyRegistry = StrategyRegistry;

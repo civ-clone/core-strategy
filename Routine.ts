@@ -8,7 +8,7 @@ import Priority from '@civ-clone/core-rule/Priority';
 import PriorityRule from './Rules/Priority';
 
 export interface IRoutine {
-  attempt(action: PlayerAction): Promise<boolean>;
+  attempt(action: PlayerAction): boolean;
   priority(player: Player): Priority;
 }
 
@@ -19,7 +19,7 @@ export class Routine implements IRoutine {
     this.#ruleRegistry = ruleRegistry;
   }
 
-  attempt(action: PlayerAction): Promise<boolean> {
+  attempt(action: PlayerAction): boolean {
     throw new TypeError('`attempt` must be overridden.');
   }
 

@@ -35,7 +35,7 @@ import { instance as strategyNoteInstance } from '@civ-clone/core-strategy/Strat
 export class MyRoutine extends Routine {
   // Inject dependencies (e.g. `Registry`s) into the `constructor` as usual
 
-  async attempt(action: PlayerAction<SpecificItemClass>): Promise<boolean> {
+  attempt(action: PlayerAction<SpecificItemClass>): boolean {
     // Check if your `Routine` can handle this type of action first, fail early as lots of routines will be even
     // more expensive to check otherwise.
     if (!(action instanceof MyHandleableAction)) {

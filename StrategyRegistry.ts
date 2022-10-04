@@ -11,7 +11,7 @@ export class StrategyRegistry extends EntityRegistry<Strategy> {
    * Iterates all `Strategy`s ordered first by `Priority`, then by a random number so that alternative strategies are
    * tried.
    */
-  attempt(action: PlayerAction): Promise<boolean> {
+  attempt(action: PlayerAction): boolean {
     return this.entries()
       .sort(
         (a, b) =>
@@ -19,11 +19,7 @@ export class StrategyRegistry extends EntityRegistry<Strategy> {
             b.priority(action.player()).value() ||
           Math.floor(Math.random() * 3 - 1)
       )
-      .reduce(
-        (promise, strategy) =>
-          promise.then((result) => result || strategy.attempt(action)),
-        Promise.resolve(false)
-      );
+      .some((strategy) => strategy.attempt(action));
   }
 }
 

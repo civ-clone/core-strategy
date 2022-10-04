@@ -4,13 +4,13 @@ exports.RoutineB = exports.RoutineA = exports.RoutineFalse = exports.RoutineTrue
 const Routine_1 = require("../../Routine");
 class RoutineTrue extends Routine_1.default {
     attempt() {
-        return Promise.resolve(true);
+        return true;
     }
 }
 exports.RoutineTrue = RoutineTrue;
 class RoutineFalse extends Routine_1.default {
     attempt() {
-        return Promise.resolve(false);
+        return false;
     }
 }
 exports.RoutineFalse = RoutineFalse;

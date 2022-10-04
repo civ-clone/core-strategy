@@ -4,7 +4,7 @@ import Priority from '@civ-clone/core-rule/Priority';
 import Routine from './Routine';
 
 export interface IStrategy {
-  attempt(action: PlayerAction): Promise<boolean>;
+  attempt(action: PlayerAction): boolean;
   priority(player: Player): Priority;
 }
 
@@ -18,18 +18,14 @@ export class Strategy implements IStrategy {
   /**
    * Checks to see if the `action` can be handled, returns `true` if it is, `false` otherwise.
    */
-  attempt(action: PlayerAction): Promise<boolean> {
+  attempt(action: PlayerAction): boolean {
     return this.#routines
       .sort(
         (a, b) =>
           a.priority(action.player()).value() -
           b.priority(action.player()).value()
       )
-      .reduce(
-        (promise, routine) =>
-          promise.then((result) => result || routine.attempt(action)),
-        Promise.resolve(false)
-      );
+      .some((routine) => routine.attempt(action));
   }
 
   priority(player: Player): Priority {
