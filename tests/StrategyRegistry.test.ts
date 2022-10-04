@@ -1,7 +1,7 @@
-import { RoutineTrue, RoutineFalse } from './lib/Routines';
+import { RoutineFalse, RoutineTrue } from './lib/Routines';
 import { expect, spy, use } from 'chai';
 import Player from '@civ-clone/core-player/Player';
-import { PlayerActionA } from './lib/PlayerActions';
+import { PlayerAction } from './lib/PlayerActions';
 import Strategy from '../Strategy';
 import StrategyRegistry from '../StrategyRegistry';
 import * as spies from 'chai-spies';
@@ -20,7 +20,7 @@ describe('StrategyRegistry', () => {
 
     strategyRegistry.register(strategyA, strategyB);
 
-    expect(await strategyRegistry.attempt(new PlayerActionA(testPlayer, null)))
+    expect(await strategyRegistry.attempt(new PlayerAction(testPlayer, null)))
       .true;
     expect(spyA).not.called;
     expect(spyB).called;
@@ -35,7 +35,7 @@ describe('StrategyRegistry', () => {
 
     strategyRegistry.register(strategyA, strategyB);
 
-    expect(await strategyRegistry.attempt(new PlayerActionA(testPlayer, null)))
+    expect(await strategyRegistry.attempt(new PlayerAction(testPlayer, null)))
       .true;
     expect(spyA).called;
     expect(spyB).not.called;
@@ -51,7 +51,7 @@ describe('StrategyRegistry', () => {
 
     strategyRegistry.register(strategyA, strategyB);
 
-    expect(await strategyRegistry.attempt(new PlayerActionA(testPlayer, null)))
+    expect(await strategyRegistry.attempt(new PlayerAction(testPlayer, null)))
       .true;
     expect(spyA).not.called;
     expect(spyB).called;
@@ -68,7 +68,7 @@ describe('StrategyRegistry', () => {
 
     strategyRegistry.register(strategyA, strategyB, strategyC);
 
-    expect(await strategyRegistry.attempt(new PlayerActionA(testPlayer, null)))
+    expect(await strategyRegistry.attempt(new PlayerAction(testPlayer, null)))
       .false;
     expect(spyA).called;
     expect(spyB).called;

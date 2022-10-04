@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.instance = exports.StrategyNoteRegistry = void 0;
 const EntityRegistry_1 = require("@civ-clone/core-registry/EntityRegistry");
 const StrategyNote_1 = require("./StrategyNote");
-class StrategyNoteRegistry extends EntityRegistry_1.default {
+class StrategyNoteRegistry extends EntityRegistry_1.EntityRegistry {
     getByKey(key) {
         return this.getBy('key', key)[0];
     }
@@ -21,6 +21,16 @@ class StrategyNoteRegistry extends EntityRegistry_1.default {
             if (this.getByKey(entity.key())) {
                 throw new TypeError(`Entity with key '${entity.key()}' already exists.`);
             }
+            super.register(entity);
+        });
+    }
+    replace(...entities) {
+        entities.forEach((entity) => {
+            const existing = this.getByKey(entity.key());
+            if (existing) {
+                this.unregister(existing);
+            }
+            this.register(entity);
         });
     }
 }

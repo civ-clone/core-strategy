@@ -1,5 +1,5 @@
 import { High, Low, Normal } from '@civ-clone/core-rule/Priorities';
-import { RoutineB, RoutineA } from './lib/Routines';
+import { RoutineA, RoutineB } from './lib/Routines';
 import { TraitFull, TraitHalf, TraitNone } from './lib/Traits';
 import Civilization from '@civ-clone/core-civilization/Civilization';
 import Criterion from '@civ-clone/core-rule/Criterion';

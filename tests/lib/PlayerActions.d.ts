@@ -1,3 +1,2 @@
-import PlayerAction from '@civ-clone/core-player/PlayerAction';
-export declare class PlayerActionA<T = null> extends PlayerAction<T> {}
-export declare class PlayerActionB<T = null> extends PlayerAction<T> {}
+import PlayerActionBase from '@civ-clone/core-player/PlayerAction';
+export declare class PlayerAction<T = null> extends PlayerActionBase<T> {}

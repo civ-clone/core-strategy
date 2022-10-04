@@ -1,10 +1,10 @@
 import { High, Normal } from '@civ-clone/core-rule/Priorities';
-import { PlayerActionA } from './lib/PlayerActions';
-import { RoutineFalse, RoutineB, RoutineA, RoutineTrue } from './lib/Routines';
+import { RoutineA, RoutineB, RoutineFalse, RoutineTrue } from './lib/Routines';
 import { expect, spy } from 'chai';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
 import Player from '@civ-clone/core-player/Player';
+import { PlayerAction } from './lib/PlayerActions';
 import Priority from '@civ-clone/core-rule/Priority';
 import PriorityRule from '../Rules/Priority';
 import Routine from '../Routine';
@@ -26,7 +26,7 @@ describe('Strategy', () => {
       spyB = spy.on(routineB, 'attempt'),
       spyC = spy.on(routineC, 'attempt');
 
-    expect(await strategy.attempt(new PlayerActionA(testPlayer, null))).true;
+    expect(await strategy.attempt(new PlayerAction(testPlayer, null))).true;
     expect(spyA).called();
     expect(spyB).called();
     expect(spyC).not.called();
@@ -58,7 +58,7 @@ describe('Strategy', () => {
       )
     );
 
-    expect(await strategy.attempt(new PlayerActionA(testPlayer, null))).true;
+    expect(await strategy.attempt(new PlayerAction(testPlayer, null))).true;
     expect(spyA).called();
     expect(spyB).not.called();
   });
@@ -72,7 +72,7 @@ describe('Strategy', () => {
       spyB = spy.on(routineB, 'attempt'),
       spyC = spy.on(routineC, 'attempt');
 
-    expect(await strategy.attempt(new PlayerActionA(testPlayer, null))).false;
+    expect(await strategy.attempt(new PlayerAction(testPlayer, null))).false;
     expect(spyA).called();
     expect(spyB).called();
     expect(spyC).called();

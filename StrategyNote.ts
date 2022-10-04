@@ -11,7 +11,7 @@ export interface IStrategyNote<Value = any> {
 
 export class StrategyNote<Value = any> implements IStrategyNote<Value> {
   #key: string;
-  #value: any;
+  #value: Value;
 
   constructor(key: string, value: Value) {
     this.#key = key;

@@ -1,4 +1,5 @@
-import EntityRegistry, {
+import {
+  EntityRegistry,
   IEntityRegistry,
 } from '@civ-clone/core-registry/EntityRegistry';
 import StrategyNote from './StrategyNote';
@@ -6,6 +7,7 @@ import StrategyNote from './StrategyNote';
 export interface IStrategyNoteRegistry extends IEntityRegistry<StrategyNote> {
   getByKey<Value = any>(key: string): StrategyNote<Value> | undefined;
   getOrCreateByKey<Value>(key: string, value: Value): StrategyNote<Value>;
+  replace(...entities: StrategyNote[]): void;
 }
 
 export class StrategyNoteRegistry
@@ -30,13 +32,27 @@ export class StrategyNoteRegistry
     return note;
   }
 
-  register(...entities: StrategyNote[]) {
+  register(...entities: StrategyNote[]): void {
     entities.forEach((entity) => {
       if (this.getByKey(entity.key())) {
         throw new TypeError(
           `Entity with key '${entity.key()}' already exists.`
         );
       }
+
+      super.register(entity);
+    });
+  }
+
+  replace(...entities: StrategyNote[]): void {
+    entities.forEach((entity) => {
+      const existing = this.getByKey(entity.key());
+
+      if (existing) {
+        this.unregister(existing);
+      }
+
+      this.register(entity);
     });
   }
 }
