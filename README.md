@@ -3,8 +3,8 @@
 A framework for building modular AI. The idea being that `Strategy`s are built of many `Routine`s for specific
 `PlayerAction`s and it should be easy enough to register new `Strategy`s to handle newly added `PlayerAction`s.
 
-The consumer `AIClient`, `SimpleAIStrategyClient`, is available at
-[civ-clone/simple-ai-strategy-client](https://github.com/civ-clone/simple-ai-strategy-client).
+The consumer `AIClient`, `StrategyAIClient`, is available at
+[civ-clone/core-strategy-ai-client](https://github.com/civ-clone/core-strategy-ai-client).
 
 Another aim for this set of classes is to be able to automate simple tasks (explore, improve terrain, go-to, etc.).
 
