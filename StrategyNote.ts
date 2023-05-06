@@ -1,8 +1,7 @@
-import DataObject from '@civ-clone/core-data-object/DataObject';
-
-type IDataObject = {
-  id(): string;
-};
+import {
+  DataObject,
+  IDataObject,
+} from '@civ-clone/core-data-object/DataObject';
 
 export interface IStrategyNote<Value = any> {
   key(): string;
@@ -27,9 +26,9 @@ export class StrategyNote<Value = any> implements IStrategyNote<Value> {
   }
 }
 
-export const generateKey: (...items: (IDataObject | string)[]) => string = (
-  ...items: (IDataObject | string)[]
-) =>
+export const generateKey: (
+  ...items: (Pick<IDataObject, 'id'> | string)[]
+) => string = (...items: (Pick<IDataObject, 'id'> | string)[]) =>
   items
     .map((item) =>
       item instanceof DataObject

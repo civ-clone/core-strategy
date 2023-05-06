@@ -1,7 +1,8 @@
 # core-strategy
 
-A framework for building modular AI. The idea being that `Strategy`s are built of many `Routine`s for specific
-`PlayerAction`s and it should be easy enough to register new `Strategy`s to handle newly added `PlayerAction`s.
+A framework for building modular AI. The idea being that `Strategy`s can handle one of many `PlayerAction`s and it
+should be easy enough to register new `Strategy`s to handle newly added `PlayerAction`s or specific custom `Unit`s and
+their actions (`Caravan`, `Diplomat`, etc).
 
 The consumer `AIClient`, `StrategyAIClient`, is available at
 [civ-clone/core-strategy-ai-client](https://github.com/civ-clone/core-strategy-ai-client).
@@ -12,27 +13,13 @@ Lastly, there's the possibility for primitive Barbarian behaviour, without havin
 
 ## Current state
 
+This is purely illustrative and might change quite substantially until I've got a reasonable working implementation.
+
 ```ts
 import Strategy from '@civ-clone/core-strategy/Strategy';
 
 // Export your base `Strategy`:
 export class MyStrategy extends Strategy {
-  constructor(
-    dependencyForRoutine: SpecificThing = defaultInstanceOfSpecificThing
-  ) {
-    super(
-      new MyRoutine(dependencyForRoutine),
-      new AnotherRoutine(dependencyForRoutine)
-    );
-  }
-}
-
-import PlayerAction from '@civ-clone/core-player/PlayerAction';
-import Routine from '@civ-clone/core-strategy/Strategy';
-import { instance as strategyNoteInstance } from '@civ-clone/core-strategy/StrategyNoteRegistry';
-
-// which is comprised of `Routine`s like the following:
-export class MyRoutine extends Routine {
   // Inject dependencies (e.g. `Registry`s) into the `constructor` as usual
 
   attempt(action: PlayerAction<SpecificItemClass>): boolean {
@@ -69,7 +56,7 @@ export class MyRoutine extends Routine {
 import { generateKey } from '@civ-clone/core-strategy/StrategyNote';
 
 export const myCustomKeyGenerator = (item: SpecificItemClass) =>
-  generateKey(item, MyRoutine.name);
+  generateKey(item, MyStrategy.name);
 
 // To control the priority of your `Routine`s you need to use `Priority` `Rule`s and you can even take the `Leader`s
 // `Trait`s into consideration if you wish:
@@ -89,7 +76,7 @@ export const getRules = (
 ): Priority[] => [
   new Priority(
     new Criterion(
-      (player: Player, routine: Routine) => routine instanceof MyRoutine
+      (player: Player, strategy: Strategy) => routine instanceof MyRoutine
     ),
     new Effect((player: Player) => {
       const civilization = player.civilization(),

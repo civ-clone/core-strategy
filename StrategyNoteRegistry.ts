@@ -14,6 +14,10 @@ export class StrategyNoteRegistry
   extends EntityRegistry<StrategyNote>
   implements IStrategyNoteRegistry
 {
+  constructor() {
+    super(StrategyNote);
+  }
+
   getByKey<Value = any>(key: string): StrategyNote<Value> | undefined {
     return this.getBy('key', key)[0];
   }

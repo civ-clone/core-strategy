@@ -31,7 +31,7 @@ class StrategyNote {
 exports.StrategyNote = StrategyNote;
 _StrategyNote_key = new WeakMap(), _StrategyNote_value = new WeakMap();
 const generateKey = (...items) => items
-    .map((item) => item instanceof DataObject_1.default
+    .map((item) => item instanceof DataObject_1.DataObject
     ? item.id()
     : typeof item === 'string'
         ? item

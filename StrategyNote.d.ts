@@ -1,6 +1,4 @@
-declare type IDataObject = {
-  id(): string;
-};
+import { IDataObject } from '@civ-clone/core-data-object/DataObject';
 export interface IStrategyNote<Value = any> {
   key(): string;
   value(): Value;
@@ -12,6 +10,6 @@ export declare class StrategyNote<Value = any> implements IStrategyNote<Value> {
   value(): Value;
 }
 export declare const generateKey: (
-  ...items: (IDataObject | string)[]
+  ...items: (Pick<IDataObject, 'id'> | string)[]
 ) => string;
 export default StrategyNote;

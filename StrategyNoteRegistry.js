@@ -4,6 +4,9 @@ exports.instance = exports.StrategyNoteRegistry = void 0;
 const EntityRegistry_1 = require("@civ-clone/core-registry/EntityRegistry");
 const StrategyNote_1 = require("./StrategyNote");
 class StrategyNoteRegistry extends EntityRegistry_1.EntityRegistry {
+    constructor() {
+        super(StrategyNote_1.default);
+    }
     getByKey(key) {
         return this.getBy('key', key)[0];
     }

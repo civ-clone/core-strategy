@@ -1,40 +1,44 @@
-import Player from '@civ-clone/core-player/Player';
+import {
+  RuleRegistry,
+  instance as ruleRegistryInstance,
+} from '@civ-clone/core-rule/RuleRegistry';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Priority from '@civ-clone/core-rule/Priority';
-import Routine from './Routine';
+import PriorityRule from './Rules/Priority';
 
 export interface IStrategy {
   attempt(action: PlayerAction): boolean;
-  priority(player: Player): Priority;
+  priority(action: PlayerAction): Priority;
 }
 
 export class Strategy implements IStrategy {
-  #routines: Routine[] = [];
+  #ruleRegistry: RuleRegistry;
 
-  constructor(...items: Routine[]) {
-    items.forEach((item) => this.#routines.push(item));
+  constructor(ruleRegistry: RuleRegistry = ruleRegistryInstance) {
+    this.#ruleRegistry = ruleRegistry;
   }
 
   /**
    * Checks to see if the `action` can be handled, returns `true` if it is, `false` otherwise.
    */
   attempt(action: PlayerAction): boolean {
-    return this.#routines
-      .sort(
-        (a, b) =>
-          a.priority(action.player()).value() -
-          b.priority(action.player()).value()
-      )
-      .some((routine) => routine.attempt(action));
+    throw new Error('This must be overwritten in the implementor.');
   }
 
-  priority(player: Player): Priority {
+  priority(action: PlayerAction): Priority {
     return new Priority(
+      // This takes the highest priority (lowest value) from all the applicable `PriorityRule`s
       Math.min(
-        ...this.#routines.map((routine) => routine.priority(player).value()),
+        ...this.#ruleRegistry
+          .process(PriorityRule, action, this)
+          .map((priority) => priority.value()),
         Infinity
       )
     );
+  }
+
+  protected ruleRegistry(): RuleRegistry {
+    return this.#ruleRegistry;
   }
 }
 

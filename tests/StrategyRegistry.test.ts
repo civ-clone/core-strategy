@@ -1,4 +1,4 @@
-import { RoutineFalse, RoutineTrue } from './lib/Routines';
+import { StrategyFalse, StrategyTrue } from './lib/Strategies';
 import { expect, spy, use } from 'chai';
 import Player from '@civ-clone/core-player/Player';
 import { PlayerAction } from './lib/PlayerActions';
@@ -12,8 +12,8 @@ describe('StrategyRegistry', () => {
   const testPlayer = new Player();
 
   it('should filter inactive `Strategy`s', async () => {
-    const strategyA = new Strategy(new RoutineTrue()),
-      strategyB = new Strategy(new RoutineTrue()),
+    const strategyA = new StrategyTrue(),
+      strategyB = new Strategy(),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt');
@@ -27,8 +27,8 @@ describe('StrategyRegistry', () => {
   });
 
   it('should stop calling `Strategy`s after the first successful `attempt()`', async () => {
-    const strategyA = new Strategy(new RoutineTrue()),
-      strategyB = new Strategy(new RoutineFalse()),
+    const strategyA = new StrategyTrue(),
+      strategyB = new StrategyFalse(),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt');
@@ -42,9 +42,8 @@ describe('StrategyRegistry', () => {
   });
 
   it('should respect `Strategy` `Priority`s', async () => {
-    const routine = new RoutineTrue(),
-      strategyA = new Strategy(routine),
-      strategyB = new Strategy(routine),
+    const strategyA = new StrategyTrue(),
+      strategyB = new StrategyTrue(),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt');
@@ -58,9 +57,9 @@ describe('StrategyRegistry', () => {
   });
 
   it('should return false if there are no successfully executed `Strategy`s', async () => {
-    const strategyA = new Strategy(new RoutineFalse()),
-      strategyB = new Strategy(new RoutineFalse()),
-      strategyC = new Strategy(new RoutineFalse()),
+    const strategyA = new StrategyFalse(),
+      strategyB = new StrategyFalse(),
+      strategyC = new StrategyFalse(),
       strategyRegistry = new StrategyRegistry(),
       spyA = spy.on(strategyA, 'attempt'),
       spyB = spy.on(strategyB, 'attempt'),

@@ -1,6 +1,6 @@
 import EntityRegistry from '@civ-clone/core-registry/EntityRegistry';
-import Strategy from './Strategy';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
+import Strategy from './Strategy';
 export declare class StrategyRegistry extends EntityRegistry<Strategy> {
   constructor();
   /**

@@ -1,6 +1,6 @@
 import EntityRegistry from '@civ-clone/core-registry/EntityRegistry';
-import Strategy from './Strategy';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
+import Strategy from './Strategy';
 
 export class StrategyRegistry extends EntityRegistry<Strategy> {
   constructor() {
@@ -15,8 +15,7 @@ export class StrategyRegistry extends EntityRegistry<Strategy> {
     return this.entries()
       .sort(
         (a, b) =>
-          a.priority(action.player()).value() -
-            b.priority(action.player()).value() ||
+          a.priority(action).value() - b.priority(action).value() ||
           Math.floor(Math.random() * 3 - 1)
       )
       .some((strategy) => strategy.attempt(action));

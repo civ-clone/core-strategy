@@ -1,6 +1,6 @@
 {
   "name": "@civ-clone/core-strategy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "git@github.com:civ-clone/core-strategy.git",
   "keywords": [
     "typescript",

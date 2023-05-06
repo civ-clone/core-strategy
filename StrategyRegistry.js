@@ -13,8 +13,7 @@ class StrategyRegistry extends EntityRegistry_1.default {
      */
     attempt(action) {
         return this.entries()
-            .sort((a, b) => a.priority(action.player()).value() -
-            b.priority(action.player()).value() ||
+            .sort((a, b) => a.priority(action).value() - b.priority(action).value() ||
             Math.floor(Math.random() * 3 - 1))
             .some((strategy) => strategy.attempt(action));
     }

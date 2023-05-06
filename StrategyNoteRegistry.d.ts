@@ -12,6 +12,7 @@ export declare class StrategyNoteRegistry
   extends EntityRegistry<StrategyNote>
   implements IStrategyNoteRegistry
 {
+  constructor();
   getByKey<Value = any>(key: string): StrategyNote<Value> | undefined;
   getOrCreateByKey<Value>(key: string, value: Value): StrategyNote<Value>;
   register(...entities: StrategyNote[]): void;
