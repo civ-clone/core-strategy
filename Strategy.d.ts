@@ -6,7 +6,7 @@ export interface IStrategy {
   priority(action: PlayerAction): Priority;
 }
 export declare class Strategy implements IStrategy {
-  #private;
+  private _ruleRegistry;
   constructor(ruleRegistry?: RuleRegistry);
   /**
    * Checks to see if the `action` can be handled, returns `true` if it is, `false` otherwise.

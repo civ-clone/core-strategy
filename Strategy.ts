@@ -12,10 +12,10 @@ export interface IStrategy {
 }
 
 export class Strategy implements IStrategy {
-  #ruleRegistry: RuleRegistry;
+  private _ruleRegistry: RuleRegistry;
 
   constructor(ruleRegistry: RuleRegistry = ruleRegistryInstance) {
-    this.#ruleRegistry = ruleRegistry;
+    this._ruleRegistry = ruleRegistry;
   }
 
   /**
@@ -29,7 +29,7 @@ export class Strategy implements IStrategy {
     return new Priority(
       // This takes the highest priority (lowest value) from all the applicable `PriorityRule`s
       Math.min(
-        ...this.#ruleRegistry
+        ...this._ruleRegistry
           .process(PriorityRule, action, this)
           .map((priority) => priority.value()),
         Infinity
@@ -38,7 +38,7 @@ export class Strategy implements IStrategy {
   }
 
   protected ruleRegistry(): RuleRegistry {
-    return this.#ruleRegistry;
+    return this._ruleRegistry;
   }
 }
 

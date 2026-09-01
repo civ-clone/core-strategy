@@ -9,20 +9,20 @@ export interface IStrategyNote<Value = any> {
 }
 
 export class StrategyNote<Value = any> implements IStrategyNote<Value> {
-  #key: string;
-  #value: Value;
+  private _key: string;
+  private _value: Value;
 
   constructor(key: string, value: Value) {
-    this.#key = key;
-    this.#value = value;
+    this._key = key;
+    this._value = value;
   }
 
   public key(): string {
-    return this.#key;
+    return this._key;
   }
 
   public value(): Value {
-    return this.#value;
+    return this._value;
   }
 }
 

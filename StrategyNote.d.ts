@@ -4,7 +4,8 @@ export interface IStrategyNote<Value = any> {
   value(): Value;
 }
 export declare class StrategyNote<Value = any> implements IStrategyNote<Value> {
-  #private;
+  private _key;
+  private _value;
   constructor(key: string, value: Value);
   key(): string;
   value(): Value;
