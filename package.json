@@ -34,6 +34,7 @@
     "@civ-clone/core-civilization": "^0.1.0",
     "@civ-clone/core-data-object": "^0.1.0",
     "@civ-clone/core-player": "^0.1.2",
+    "@civ-clone/core-random": "^0.1.0",
     "@civ-clone/core-registry": "^0.1.0",
     "@civ-clone/core-rule": "^0.1.1"
   }
