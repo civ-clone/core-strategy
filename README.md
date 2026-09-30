@@ -40,12 +40,36 @@ by `Priority` value, lowest (highest priority) first. Ties, including `Strategy`
 
 ```ts
 import {
+  RuleRegistry,
+  instance as ruleRegistryInstance,
+} from '@civ-clone/core-rule/RuleRegistry';
+import {
   StrategyNoteRegistry,
   instance as strategyNoteRegistryInstance,
 } from '@civ-clone/core-strategy/StrategyNoteRegistry';
+import {
+  TraitRegistry,
+  instance as traitRegistryInstance,
+} from '@civ-clone/core-civilization/TraitRegistry';
+import { High, Normal } from '@civ-clone/core-rule/Priorities';
+import Criterion from '@civ-clone/core-rule/Criterion';
+import Effect from '@civ-clone/core-rule/Effect';
+import Leader from '@civ-clone/core-civilization/Leader';
+import Player from '@civ-clone/core-player/Player';
 import PlayerAction from '@civ-clone/core-player/PlayerAction';
+import Priority from '@civ-clone/core-strategy/Rules/Priority';
 import Strategy from '@civ-clone/core-strategy/Strategy';
 import StrategyNote, { generateKey } from '@civ-clone/core-strategy/StrategyNote';
+import Tile from '@civ-clone/core-world/Tile';
+import Trait from '@civ-clone/core-civilization/Trait';
+import Unit from '@civ-clone/core-unit/Unit';
+import { instance as strategyRegistryInstance } from '@civ-clone/core-strategy/StrategyRegistry';
+
+// Placeholders for your plugin's own code, not part of any package:
+// - `MyAction`: a `PlayerAction<Unit>` your plugin offers;
+// - `MyTrait`: a `Trait` your plugin (or a ruleset) registers;
+// - `doSomethingWith(unit, tile)`: whatever your `Strategy` actually does;
+// - `action`, `humanPlayer`, `unit`: values from wherever you run this.
 
 // A key helper keeps the parts of the key consistent wherever the note is read or written.
 export const lastSeenKey = (player: Player, unit: Unit): string =>
@@ -93,10 +117,6 @@ export class MyStrategy extends Strategy {
 }
 
 // To control the order of `Strategy`s, use `Priority` `Rule`s. They can take the `Leader`'s `Trait`s into account.
-import { High, Normal } from '@civ-clone/core-rule/Priorities';
-import Criterion from '@civ-clone/core-rule/Criterion';
-import Effect from '@civ-clone/core-rule/Effect';
-import Priority from '@civ-clone/core-strategy/Rules/Priority';
 
 export const getRules = (
   traitRegistry: TraitRegistry = traitRegistryInstance
