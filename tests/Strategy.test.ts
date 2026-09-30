@@ -1,6 +1,6 @@
 import { High, Low, Normal } from '@civ-clone/core-rule/Priorities';
-import { StrategyA, StrategyB, StrategyFalse } from './lib/Strategies';
-import { expect, spy } from 'chai';
+import { StrategyA, StrategyB } from './lib/Strategies';
+import { expect } from 'chai';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import Effect from '@civ-clone/core-rule/Effect';
 import Player from '@civ-clone/core-player/Player';
@@ -9,7 +9,6 @@ import PriorityRule from '../Rules/Priority';
 import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
 import Strategy from '../Strategy';
 import PlayerActionBase from '@civ-clone/core-player/PlayerAction';
-import StrategyRegistry from '../StrategyRegistry';
 import TraitRegistry from '@civ-clone/core-civilization/TraitRegistry';
 import Civilization from '@civ-clone/core-civilization/Civilization';
 import { TraitFull, TraitHalf, TraitNone } from './lib/Traits';
@@ -22,55 +21,11 @@ describe('Strategy', () => {
   it('should default to `Priority(Infinity)`', () =>
     expect(new Strategy().priority(action).value()).eq(Infinity));
 
-  it('should respect `Strategy` `Priority`s', async () => {
-    const ruleRegistry = new RuleRegistry(),
-      strategyRegistry = new StrategyRegistry(),
-      strategyA = new StrategyA(ruleRegistry),
-      strategyB = new StrategyB(ruleRegistry),
-      spyA = spy.on(strategyA, 'attempt'),
-      spyB = spy.on(strategyB, 'attempt');
+  it('should handle every `PlayerAction` by default', () =>
+    expect(new Strategy().handles(action)).true);
 
-    strategyRegistry.register(strategyA, strategyB);
-
-    ruleRegistry.register(
-      ...(
-        [
-          [StrategyA, High],
-          [StrategyB, Normal],
-        ] as [typeof Strategy, typeof Priority][]
-      ).map(
-        ([StrategyType, PriorityType]) =>
-          new PriorityRule(
-            new Criterion(
-              (action: PlayerActionBase, strategy: Strategy) =>
-                strategy instanceof StrategyType
-            ),
-            new Effect(() => new PriorityType())
-          )
-      )
-    );
-
-    expect(await strategyRegistry.attempt(action)).true;
-    expect(spyA).called();
-    expect(spyB).not.called();
-  });
-
-  it('should return false if there are no successfully executed `Strategy`s', async () => {
-    const strategyA = new StrategyFalse(),
-      strategyB = new StrategyFalse(),
-      strategyC = new StrategyFalse(),
-      strategyRegistry = new StrategyRegistry(),
-      spyA = spy.on(strategyA, 'attempt'),
-      spyB = spy.on(strategyB, 'attempt'),
-      spyC = spy.on(strategyC, 'attempt');
-
-    strategyRegistry.register(strategyA, strategyB, strategyC);
-
-    expect(await strategyRegistry.attempt(action)).false;
-    expect(spyA).called();
-    expect(spyB).called();
-    expect(spyC).called();
-  });
+  it('should require `attempt` to be implemented', () =>
+    expect(() => new Strategy().attempt(action)).throw());
 
   it('should be possible to prioritise based on `Priority` `Rule`s', async () => {
     const traitRegistry = new TraitRegistry(),
