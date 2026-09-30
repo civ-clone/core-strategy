@@ -1,95 +1,121 @@
 # core-strategy
 
-A framework for building modular AI. The idea being that `Strategy`s can handle one of many `PlayerAction`s and it
-should be easy enough to register new `Strategy`s to handle newly added `PlayerAction`s or specific custom `Unit`s and
-their actions (`Caravan`, `Diplomat`, etc).
+A framework for building modular AI. A `Strategy` handles one or more kinds of `PlayerAction`, so a plugin that adds a
+new `PlayerAction`, or a specific `Unit` and its actions (`Caravan`, `Diplomat`, etc.), can ship the `Strategy`s that
+handle it, and computer players use them straight away.
 
 The consumer `AIClient`, `StrategyAIClient`, is available at
 [civ-clone/core-strategy-ai-client](https://github.com/civ-clone/core-strategy-ai-client).
 
-Another aim for this set of classes is to be able to automate simple tasks (explore, improve terrain, go-to, etc.).
+The same `Strategy`s can also automate tasks for a human player (explore, improve terrain, choose production, etc.), and
+could drive primitive Barbarian behaviour without a "ghost" player (like Civ1).
 
-Lastly, there's the possibility for primitive Barbarian behaviour, without having a "ghost" player (like Civ1).
+## The contract
 
-## Current state
+- **`Strategy`s are game-wide.** They're registered once, into the game's `StrategyRegistry`, and shared by every
+  player, so a `Strategy` must be **stateless**: don't keep anything about a player, unit or city on the instance.
+- **The player comes from the action**: `action.player()`. Nothing may assume the player is a computer player.
+- **Memory lives in `StrategyNote`s**, in the `StrategyNoteRegistry`. Notes are `DataObject`s, so they are saved with
+  the game. Build keys with `generateKey`, and include whatever the note is about (the player, unit or city) so that
+  different players' notes can't collide. A note's key never changes; use `replace` to swap in a new note.
+- **`handles(action)`** is a cheap, side-effect-free filter (e.g. `action instanceof MyAction`). The registry skips a
+  `Strategy` that returns `false` without evaluating its `Priority` rules or calling `attempt`. It defaults to `true`.
+- **`attempt(action)`** returns `true` if it handled the action and `false` otherwise, and may be `async`
+  (`boolean | Promise<boolean>`).
+- **A `Strategy` can be run directly**, `await strategy.attempt(action)`, for a single unit or city, for example to
+  automate one of a human player's units.
 
-This is purely illustrative and might change quite substantially until I've got a reasonable working implementation.
+## The registry
+
+`StrategyRegistry` takes the `Strategy`s that `handle` the action, computes each one's `Priority` once, and orders them
+by `Priority` value, lowest (highest priority) first. Ties, including `Strategy`s with no `Priority` rule at all
+(`Infinity`), go to registration order. Nothing about the order is random.
+
+- `await registry.attempt(action)` tries them one at a time, awaiting each, and stops at the first that returns `true`.
+  It resolves `true` if one did.
+- `await registry.attemptAll(action)` runs every one of them, one at a time, whatever each returns, and resolves `true`
+  if any returned `true`. It is for actions that several plugins each contribute to, such as a per-turn hook.
+
+## Example
 
 ```ts
+import {
+  StrategyNoteRegistry,
+  instance as strategyNoteRegistryInstance,
+} from '@civ-clone/core-strategy/StrategyNoteRegistry';
+import PlayerAction from '@civ-clone/core-player/PlayerAction';
 import Strategy from '@civ-clone/core-strategy/Strategy';
+import StrategyNote, { generateKey } from '@civ-clone/core-strategy/StrategyNote';
 
-// Export your base `Strategy`:
+// A key helper keeps the parts of the key consistent wherever the note is read or written.
+export const lastSeenKey = (player: Player, unit: Unit): string =>
+  generateKey('my-plugin:last-seen', player, unit);
+
 export class MyStrategy extends Strategy {
-  // Inject dependencies (e.g. `Registry`s) into the `constructor` as usual
+  private _strategyNoteRegistry: StrategyNoteRegistry;
 
-  attempt(action: PlayerAction<SpecificItemClass>): boolean {
-    // Check if your `Routine` can handle this type of action first, fail early as lots of routines will be even
-    // more expensive to check otherwise.
-    if (!(action instanceof MyHandleableAction)) {
+  // Inject dependencies (e.g. `Registry`s) into the `constructor` as usual.
+  constructor(
+    ruleRegistry: RuleRegistry = ruleRegistryInstance,
+    strategyNoteRegistry: StrategyNoteRegistry = strategyNoteRegistryInstance
+  ) {
+    super(ruleRegistry);
+
+    this._strategyNoteRegistry = strategyNoteRegistry;
+  }
+
+  handles(action: PlayerAction): boolean {
+    return action instanceof MyAction;
+  }
+
+  async attempt(action: MyAction): Promise<boolean> {
+    const player = action.player(),
+      unit = action.value(),
+      note = this._strategyNoteRegistry.getByKey<Tile>(
+        lastSeenKey(player, unit)
+      );
+
+    if (!note) {
       return false;
     }
 
-    // In here you can use any existing code, for example you could trigger existing `Action`s for `Unit`s...
+    // Use any existing code here, for example perform one of the unit's `Action`s. It's fine to `await` (e.g. a
+    // negotiation); nothing else is attempted until this resolves.
+    await doSomethingWith(unit, note.value());
 
-    // If you need to share data across many `Strategy`s or `Routine`s you can use the `StrategyNoteRegistry` (with
-    // an optional custom `generateKey` method to ensure you always use the expected key).
-    const existingNote = strategyNoteRegistryInstance.getByKey(
-      myCustomKeyGenerator(action.value())
+    this._strategyNoteRegistry.replace(
+      new StrategyNote(lastSeenKey(player, unit), unit.tile())
     );
 
-    if (!existingNote) {
-      return false;
-    }
-
-    const data = existingNote.value(),
-      newAction = new DoSomething(data.x(), data.y(), data.thing());
-
-    newAction.perform(action);
-
-    // When you have handled the action, ensure you return `true` to prevent any more actions from triggering.
+    // Returning `true` stops any other `Strategy` being tried for this action.
     return true;
   }
 }
 
-// The core `generateKey` method exists in `StrategyNote`, but having a more specific function associated to your
-// `Strategy` can help ensure you are passing the expected entities and get consistent keys.
-import { generateKey } from '@civ-clone/core-strategy/StrategyNote';
-
-export const myCustomKeyGenerator = (item: SpecificItemClass) =>
-  generateKey(item, MyStrategy.name);
-
-// To control the priority of your `Routine`s you need to use `Priority` `Rule`s and you can even take the `Leader`s
-// `Trait`s into consideration if you wish:
+// To control the order of `Strategy`s, use `Priority` `Rule`s. They can take the `Leader`'s `Trait`s into account.
 import { High, Normal } from '@civ-clone/core-rule/Priorities';
-import {
-  TraitRegistry,
-  instance as traitRegistryInstance,
-} from '@civ-clone/core-civilization/TraitRegistry';
-import Expansionist from '@civ-clone/base-leader-trait-development/Development/Expansionist';
-import Player from '@civ-clone/core-player/Player';
+import Criterion from '@civ-clone/core-rule/Criterion';
+import Effect from '@civ-clone/core-rule/Effect';
 import Priority from '@civ-clone/core-strategy/Rules/Priority';
-import Routine from '@civ-clone/core-strategy/Strategy';
-import Trait from '@civ-clone/core-civilization/Trait';
 
 export const getRules = (
   traitRegistry: TraitRegistry = traitRegistryInstance
 ): Priority[] => [
   new Priority(
     new Criterion(
-      (player: Player, strategy: Strategy) => routine instanceof MyRoutine
+      (action: PlayerAction, strategy: Strategy): boolean =>
+        strategy instanceof MyStrategy
     ),
-    new Effect((player: Player) => {
-      const civilization = player.civilization(),
-        leader = civilization.leader();
+    new Effect((action: PlayerAction) => {
+      const leader = action.player().civilization().leader();
 
       if (
         leader &&
-        traitRegistry.some(
-          (trait: Trait) =>
-            leader instanceof trait.leader() && trait instanceof Expansionist
-        )
+        traitRegistry
+          .getByLeader(leader.sourceClass() as typeof Leader)
+          .some((trait: Trait): boolean => trait instanceof MyTrait)
       ) {
-        // Could be any arbitrary `Priority` (from `core-rule`) to give more fine-grained control.
+        // Any `Priority` value (from `core-rule`) can be used for finer control.
         return new High();
       }
 
@@ -98,13 +124,14 @@ export const getRules = (
   ),
 ];
 
-// In the main entrypoint make sure you register the `Rule`s and the `Strategy`:
-import { instance as ruleRegistryInstance } from '@civ-clone/core-rule/RuleRegistry';
-import { instance as strategyRegistryInstance } from '@civ-clone/core-strategy/StrategyRegistry';
-
+// Register the `Rule`s and the `Strategy` from your plugin's entry point (into the game's registries, `game.rules` and
+// `game.strategies`, where your plugin is given a `Game`):
 ruleRegistryInstance.register(...getRules());
 strategyRegistryInstance.register(new MyStrategy());
 
-// `StrategyNote`s can be written from anywhere, for example when first making contact with another `Player` or when a
-// `Tile` is discovered, which can then be acted upon.
+// A client offers actions to the registry...
+await strategyRegistryInstance.attempt(action);
+
+// ...and automation can run one `Strategy` for one unit or city directly:
+await new MyStrategy().attempt(new MyAction(humanPlayer, unit));
 ```
