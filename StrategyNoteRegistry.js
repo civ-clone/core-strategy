@@ -6,9 +6,13 @@ const StrategyNote_1 = require("./StrategyNote");
 class StrategyNoteRegistry extends EntityRegistry_1.EntityRegistry {
     constructor() {
         super(StrategyNote_1.default);
+        // A note's key is fixed for its lifetime: `StrategyNote` has no setter, and `replace` swaps one note for another rather
+        // than re-keying it. So the index never needs a `reindex`. A note restored from a save is filled before it is
+        // registered, so it is filed under its key like any other.
+        this._byKey = this.index((note) => note.key());
     }
     getByKey(key) {
-        return this.getBy('key', key)[0];
+        return this._byKey.get(key)[0];
     }
     getOrCreateByKey(key, value) {
         const existing = this.getByKey(key);
