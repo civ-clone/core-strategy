@@ -74,6 +74,8 @@ export const generateKey: (
         ? item.id()
         : typeof item === 'string'
         ? item
+        : typeof item.id === 'function'
+        ? item.id()
         : item.toString()
     )
     .join('-');

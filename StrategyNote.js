@@ -54,7 +54,9 @@ const generateKey = (...items) => items
     ? item.id()
     : typeof item === 'string'
         ? item
-        : item.toString())
+        : typeof item.id === 'function'
+            ? item.id()
+            : item.toString())
     .join('-');
 exports.generateKey = generateKey;
 exports.default = StrategyNote;
