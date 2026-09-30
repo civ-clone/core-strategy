@@ -263,4 +263,36 @@ describe('StrategyRegistry', () => {
       expect(spyB).to.have.been.called.once;
     });
   });
+
+  describe('ordered', () => {
+    it('should list the handling `Strategy`s in the order `attempt` tries them, without attempting any', async () => {
+      const ruleRegistry = new RuleRegistry(),
+        log: string[] = [],
+        strategyA = new LoggingStrategy('A', false, log, ruleRegistry),
+        strategyB = new LoggingStrategy('B', false, log, ruleRegistry),
+        strategyC = new LoggingStrategy('C', false, log, ruleRegistry),
+        notHandling = new StrategyNotHandling(ruleRegistry),
+        strategyRegistry = new StrategyRegistry();
+
+      priorityFor(ruleRegistry, strategyC, 1);
+
+      strategyRegistry.register(strategyA, notHandling, strategyB, strategyC);
+
+      const ordered = strategyRegistry.ordered(action);
+
+      expect(ordered.length).equal(3);
+      expect(ordered[0]).equal(strategyC);
+      expect(ordered[1]).equal(strategyA);
+      expect(ordered[2]).equal(strategyB);
+      expect(log).eql([]);
+
+      await strategyRegistry.attempt(action);
+
+      expect(log.filter((entry) => entry.endsWith('start'))).eql([
+        'C start',
+        'A start',
+        'B start',
+      ]);
+    });
+  });
 });

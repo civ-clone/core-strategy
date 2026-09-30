@@ -39,8 +39,10 @@ class StrategyRegistry extends EntityRegistry_1.default {
         return handled;
     }
     /**
-     * The `Strategy`s that `handle` the `action`, ordered by `Priority` value, lowest (highest priority) first, then by
-     * registration order. Each `Strategy`'s priority is computed once.
+     * The `Strategy`s that handle this action, in the order `attempt` tries them: by `Priority` value, lowest (highest
+     * priority) first, then by registration order. Each `Strategy`'s priority is computed once per call.
+     *
+     * For a caller that needs to know which `Strategy` produced a result, and so iterates them itself.
      */
     ordered(action) {
         return this.entries()
